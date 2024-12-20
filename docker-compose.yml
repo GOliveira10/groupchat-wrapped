@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - whatsapp-service
+      - analysis-service
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  whatsapp-service:
+    build: ./backend/whatsapp-service
+    ports:
+      - "3001:3001"
+    volumes:
+      - whatsapp-sessions:/usr/src/app/whatsapp-sessions
+
+  analysis-service:
+    build: ./backend/analysis-service
+    ports:
+      - "8000:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+volumes:
+  whatsapp-sessions:

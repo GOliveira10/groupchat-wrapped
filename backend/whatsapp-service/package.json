@@ -1,0 +1,18 @@
+{
+  "name": "whatsapp-analyzer-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "node-fetch": "^2.6.7",
+    "venom-bot": "^4.3.7"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "docker:build": "docker build -t whatsapp-backend .",
+    "docker:run": "docker run -p 3001:3001 -v whatsapp-sessions:/usr/src/app/whatsapp-sessions whatsapp-backend",
+    "docker:compose": "docker-compose up --build"
+  }
+}
