@@ -33,7 +33,7 @@ detect_hangout_ai <- function(message){
 
   # Create the JSON payload
   payload <- list(
-    model = "gpt-3.5-turbo", # Changed from gpt-4o-mini to gpt-4
+    model = "gpt-5-nano", # Changed from gpt-4o-mini to gpt-4
     messages = list(
       list(role = "user", content = prompt)
     )
@@ -83,7 +83,7 @@ summarize_day <- function(day_data){
 
   # Create the JSON payload
   payload <- list(
-    model = "gpt-4o-mini", # Changed from gpt-4o-mini to gpt-4
+    model = "gpt-5-nano", # Changed from gpt-5-nano
     messages = list(
       list(role = "user", content = prompt)
     )
@@ -197,6 +197,7 @@ function(transcript){
       sender == "~Brett" ~ "Brett Graham",
       sender == "~DD" ~ "Dan Dean",
       sender == "Cody" ~ "Cody Anderson",
+      sender == "You" ~ NULL,
       TRUE ~ sender
     )) %>%
     filter(sender != "Meta AI" & sender != "" & !str_detect(sender, "~"))
@@ -229,8 +230,15 @@ function(transcript){
     summarize(message_count = n(), .groups="drop") %>%
     as.data.frame()
 
-  first_half_count <- sum(monthly_messages_data$message_count[c(1:floor(nrow(monthly_messages_data)/2))])
-  last_half_count <- sum(monthly_messages_data$message_count[c(floor(nrow(monthly_messages_data)/2):length(monthly_messages_data))])
+  half_counts <- message_data %>%
+    mutate(day_num = day(date),
+           middle_day = median(date),
+           year_part = ifelse(day_num <= middle_day, "first_half", "second_half")) %>%
+    group_by(year_part) %>%
+    summarize(message_count = n())
+  
+  first_half_count <- half_counts %>% filter(year_part = "first_half") %>% pull()
+  last_half_count <- half_counts %>% filter(year_part = "second_half") %>% pull()
   ratio <- last_half_count/first_half_count - 1
 
   if(ratio > 0){
